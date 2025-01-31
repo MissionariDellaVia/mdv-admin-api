@@ -9,9 +9,13 @@ use Illuminate\Support\Facades\Validator;
 
 class SaintController extends BaseApiController
 {
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
-        $saints = Saint::all();
+        // Get pagination parameters with default values
+        $page = $request->input('page', 1);
+        $limit = $request->input('limit', 10);
+
+        $saints = Saint::query()->paginate($limit, ['*'], 'page', $page);
         return $this->sendResponse($saints);
     }
 

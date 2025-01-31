@@ -12,9 +12,13 @@ use Mockery\Exception;
 
 class GospelController extends BaseApiController
 {
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
-        $gospels = Gospel::with(['comments', 'gospelWays'])->get();
+        // Get pagination parameters with default values
+        $page = $request->input('page', 1);
+        $limit = $request->input('limit', 10);
+
+        $gospels = Gospel::with(['comments'])->paginate($limit, ['*'], 'page', $page);
         return $this->sendResponse($gospels);
     }
 
@@ -41,7 +45,7 @@ class GospelController extends BaseApiController
     {
         try {
             $gospel = Gospel::findOrFail($id);
-            $gospel->load(['comments', 'gospelWays']);
+            $gospel->load(['comments']);
             return $this->sendResponse($gospel);
         } catch (ModelNotFoundException $e) {
             Log::error('Gospel not found', ['id' => $id, 'exception' => $e]);

@@ -15,6 +15,10 @@ class GospelWayController extends BaseApiController
 {
     public function index(Request $request): JsonResponse
     {
+        // Get pagination parameters with default values
+        $page = $request->input('page', 1);
+        $limit = $request->input('limit', 10);
+
         $query = GospelWay::with(['gospel', 'saint']);
 
         // Filter by date range
@@ -27,7 +31,7 @@ class GospelWayController extends BaseApiController
             $query->where('liturgical_season', $request->liturgical_season);
         }
 
-        $gospelWays = $query->orderBy('calendar_date')->get();
+        $gospelWays = $query->orderBy('calendar_date')->paginate($limit, ['*'], 'page', $page);
         return $this->sendResponse($gospelWays);
     }
 
