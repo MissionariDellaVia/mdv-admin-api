@@ -47,7 +47,6 @@ CREATE TABLE comments (
     extra_info TEXT,
     youtube_link VARCHAR(255),
     comment_order INT,
-    is_latest BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME,
     FOREIGN KEY (gospel_id) REFERENCES gospels(gospel_id) ON DELETE CASCADE,
@@ -81,31 +80,31 @@ CREATE TABLE contact_types (
     updated_at DATETIME
 ) ENGINE=InnoDB;
 
--- Addresses
-CREATE TABLE addresses (
-    address_id INT AUTO_INCREMENT PRIMARY KEY,
+-- Places
+CREATE TABLE places (
+    place_id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255),
     street VARCHAR(255),
     city VARCHAR(100),
     state VARCHAR(100),
     postal_code VARCHAR(20),
-    country VARCHAR(100),
     latitude DECIMAL(10, 8),
     longitude DECIMAL(11, 8),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME
 ) ENGINE=InnoDB;
 
--- Contacts with their types and addresses
+-- Contacts with their types and places
 CREATE TABLE contacts (
     contact_id INT AUTO_INCREMENT PRIMARY KEY,
     contact_type_id INT NOT NULL,
     contact_value VARCHAR(255) NOT NULL,
-    address_id INT,
+    place_id INT,
     is_active BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME,
     FOREIGN KEY (contact_type_id) REFERENCES contact_types(contact_type_id),
-    FOREIGN KEY (address_id) REFERENCES addresses(address_id)
+    FOREIGN KEY (place_id) REFERENCES places(place_id)
 ) ENGINE=InnoDB;
 
 -- Events and Appointments
@@ -121,10 +120,10 @@ CREATE TABLE events (
     is_holy_mass BOOLEAN DEFAULT FALSE,
     is_recurring BOOLEAN DEFAULT FALSE,
     recurrence_pattern VARCHAR(50),
-    address_id INT,
+    place_id INT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME,
-    FOREIGN KEY (address_id) REFERENCES addresses(address_id)
+    FOREIGN KEY (place_id) REFERENCES places(place_id)
 ) ENGINE=InnoDB;
 
 -- Static Content Pages

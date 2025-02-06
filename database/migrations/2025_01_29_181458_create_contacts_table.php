@@ -12,7 +12,7 @@ return new class extends Migration
             $table->id('contact_id');
             $table->foreignId('contact_type_id')->constrained('contact_types', 'contact_type_id');
             $table->string('contact_value', 255);
-            $table->foreignId('address_id')->nullable()->constrained('addresses', 'address_id');
+            $table->foreignId('place_id')->nullable()->constrained('places', 'place_id');
             $table->boolean('is_active')->default(true);
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('updated_at')->nullable();

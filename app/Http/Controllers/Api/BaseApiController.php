@@ -9,14 +9,7 @@ class BaseApiController extends Controller
 {
     protected function sendResponse($data, int $code = 200): JsonResponse
     {
-        return response()->json([
-            'success' => true,
-            'data' => $data,
-            'metadata' => [
-                'timestamp' => now()->format('Y-m-d H:i:s'),
-                'user' => auth()->user()?->name ?? 'admin'
-            ]
-        ], $code);
+        return response()->json($data, $code);
     }
 
     protected function sendError($message, $errors = [], int $code = 400): JsonResponse

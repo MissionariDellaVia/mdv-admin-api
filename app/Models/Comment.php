@@ -16,11 +16,9 @@ class Comment extends Model
         'extra_info',
         'youtube_link',
         'comment_order',
-        'is_latest'
     ];
 
     protected $casts = [
-        'is_latest' => 'boolean',
         'created_at' => 'datetime',
         'updated_at' => 'datetime'
     ];

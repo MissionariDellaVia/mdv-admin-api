@@ -11,14 +11,14 @@ class CommentController extends BaseApiController
 {
     public function index(Request $request): JsonResponse
     {
-        $query = Comment::with('gospel');
+        // Get pagination parameters with default values
+        $page = $request->input('page', 1);
+        $limit = $request->input('limit', 10);
 
-        // Optional filtering by gospel_id
-        if ($request->has('gospel_id')) {
-            $query->where('gospel_id', $request->gospel_id);
-        }
+        $comments = Comment::query()
+            ->orderBy('comment_order')
+            ->paginate($limit, ['*'], 'page', $page);
 
-        $comments = $query->orderBy('comment_order')->get();
         return $this->sendResponse($comments);
     }
 
@@ -29,7 +29,6 @@ class CommentController extends BaseApiController
             'comment_text' => 'required|string',
             'extra_info' => 'nullable|string',
             'youtube_link' => 'nullable|url|max:255',
-            'is_latest' => 'boolean'
         ]);
 
         if ($validator->fails()) {

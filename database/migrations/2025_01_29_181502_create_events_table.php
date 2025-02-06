@@ -20,7 +20,7 @@ return new class extends Migration
             $table->boolean('is_holy_mass')->default(false);
             $table->boolean('is_recurring')->default(false);
             $table->string('recurrence_pattern', 50)->nullable();
-            $table->foreignId('address_id')->nullable()->constrained('addresses', 'address_id');
+            $table->foreignId('place_id')->nullable()->constrained('places', 'place_id');
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('updated_at')->nullable();
         });

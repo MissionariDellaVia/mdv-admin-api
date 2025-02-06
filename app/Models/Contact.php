@@ -13,7 +13,7 @@ class Contact extends Model
     protected $fillable = [
         'contact_type_id',
         'contact_value',
-        'address_id',
+        'place_id',
         'is_active'
     ];
 
@@ -28,8 +28,8 @@ class Contact extends Model
         return $this->belongsTo(ContactType::class, 'contact_type_id');
     }
 
-    public function address(): BelongsTo
+    public function place(): BelongsTo
     {
-        return $this->belongsTo(Address::class, 'address_id');
+        return $this->belongsTo(Place::class, 'place_id');
     }
 }

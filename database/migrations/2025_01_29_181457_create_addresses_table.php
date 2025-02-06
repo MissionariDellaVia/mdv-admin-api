@@ -8,8 +8,8 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('addresses', function (Blueprint $table) {
-            $table->id('address_id');
+        Schema::create('places', function (Blueprint $table) {
+            $table->id('place_id');
             $table->string('street', 255)->nullable();
             $table->string('city', 100)->nullable();
             $table->string('state', 100)->nullable();
@@ -24,6 +24,6 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::dropIfExists('addresses');
+        Schema::dropIfExists('places');
     }
 };

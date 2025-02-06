@@ -11,7 +11,7 @@ class EventController extends BaseApiController
 {
     public function index(Request $request): JsonResponse
     {
-        $query = Event::with('address');
+        $query = Event::with('place');
 
         // Filter by date range if provided
         if ($request->has('start_date')) {
@@ -46,7 +46,7 @@ class EventController extends BaseApiController
             'is_holy_mass' => 'boolean',
             'is_recurring' => 'boolean',
             'recurrence_pattern' => 'nullable|string|max:50',
-            'address_id' => 'nullable|exists:addresses,address_id'
+            'place_id' => 'nullable|exists:places,place_id'
         ]);
 
         if ($validator->fails()) {
@@ -59,7 +59,7 @@ class EventController extends BaseApiController
 
     public function show(Event $event): JsonResponse
     {
-        $event->load('address');
+        $event->load('place');
         return $this->sendResponse($event);
     }
 
@@ -76,7 +76,7 @@ class EventController extends BaseApiController
             'is_holy_mass' => 'boolean',
             'is_recurring' => 'boolean',
             'recurrence_pattern' => 'nullable|string|max:50',
-            'address_id' => 'nullable|exists:addresses,address_id'
+            'place_id' => 'nullable|exists:places,place_id'
         ]);
 
         if ($validator->fails()) {
@@ -84,7 +84,7 @@ class EventController extends BaseApiController
         }
 
         $event->update($validator->validated());
-        $event->load('address');
+        $event->load('place');
         return $this->sendResponse($event);
     }
 

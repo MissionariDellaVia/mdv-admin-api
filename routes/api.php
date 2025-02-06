@@ -8,7 +8,7 @@ use App\Http\Controllers\Api\{
     CommentController,
     GospelWayController,
     ContactTypeController,
-    AddressController,
+    PlaceController,
     ContactController,
     EventController,
     TextContentController,
@@ -48,12 +48,15 @@ Route::prefix('mdv/v1')->group(function () {
     Route::get('seeds/random', [SeedController::class, 'random']);
     Route::apiResource('seeds', SeedController::class);
 
+    Route::get('search/gospels', [GospelController::class, 'searchVerse']);
+
     // Contact Management Routes
     Route::group(['prefix' => 'contacts'], function () {
         Route::apiResource('types', ContactTypeController::class);
-        Route::apiResource('addresses', AddressController::class);
-        Route::apiResource('list', ContactController::class);
+        Route::apiResource('places', PlaceController::class);
     });
+
+    Route::apiResource('contacts', ContactController::class);
 
     // Events Management
     Route::apiResource('events', EventController::class);

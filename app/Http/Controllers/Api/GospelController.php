@@ -80,4 +80,22 @@ class GospelController extends BaseApiController
         $gospel->delete();
         return $this->sendResponse(null, 204);
     }
+
+    public function searchVerse(Request $request): JsonResponse
+    {
+        $query = $request->input('query', '');
+
+        if (empty($query)) {
+            $results = Gospel::query()
+                ->orderBy('updated_at', 'desc')
+                ->limit(10)
+                ->get(['gospel_id', 'gospel_verse']);
+        }
+
+        $results = Gospel::where('gospel_verse', 'like', '%' . $query . '%')
+            ->limit(10)
+            ->get(['gospel_id', 'gospel_verse']);
+
+        return $this->sendResponse($results);
+    }
 }

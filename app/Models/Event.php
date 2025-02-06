@@ -21,7 +21,7 @@ class Event extends Model
         'is_holy_mass',
         'is_recurring',
         'recurrence_pattern',
-        'address_id'
+        'place_id'
     ];
 
     protected $casts = [
@@ -35,8 +35,8 @@ class Event extends Model
         'updated_at' => 'datetime'
     ];
 
-    public function address(): BelongsTo
+    public function place(): BelongsTo
     {
-        return $this->belongsTo(Address::class, 'address_id');
+        return $this->belongsTo(Place::class, 'place_id');
     }
 }

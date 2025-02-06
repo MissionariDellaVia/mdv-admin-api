@@ -5,17 +5,17 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class Address extends Model
+class Place extends Model
 {
-    protected $primaryKey = 'address_id';
+    protected $primaryKey = 'place_id';
     public $timestamps = true;
 
     protected $fillable = [
+        'name',
         'street',
         'city',
         'state',
         'postal_code',
-        'country',
         'latitude',
         'longitude'
     ];
@@ -29,11 +29,11 @@ class Address extends Model
 
     public function contacts(): HasMany
     {
-        return $this->hasMany(Contact::class, 'address_id');
+        return $this->hasMany(Contact::class, 'place_id');
     }
 
     public function events(): HasMany
     {
-        return $this->hasMany(Event::class, 'address_id');
+        return $this->hasMany(Event::class, 'place_id');
     }
 }

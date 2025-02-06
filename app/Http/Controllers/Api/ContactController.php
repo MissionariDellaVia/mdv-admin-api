@@ -11,7 +11,7 @@ class ContactController extends BaseApiController
 {
     public function index(Request $request): JsonResponse
     {
-        $query = Contact::with(['contactType', 'address']);
+        $query = Contact::with(['contactType', 'place']);
 
         // Optional filtering by contact type
         if ($request->has('contact_type_id')) {
@@ -27,7 +27,7 @@ class ContactController extends BaseApiController
         $validator = Validator::make($request->all(), [
             'contact_type_id' => 'required|exists:contact_types,contact_type_id',
             'contact_value' => 'required|string|max:255',
-            'address_id' => 'nullable|exists:addresses,address_id',
+            'place_id' => 'nullable|exists:places,place_id',
             'is_active' => 'boolean'
         ]);
 
@@ -36,13 +36,13 @@ class ContactController extends BaseApiController
         }
 
         $contact = Contact::create($validator->validated());
-        $contact->load(['contactType', 'address']);
+        $contact->load(['contactType', 'place']);
         return $this->sendResponse($contact, 201);
     }
 
     public function show(Contact $contact): JsonResponse
     {
-        $contact->load(['contactType', 'address']);
+        $contact->load(['contactType', 'place']);
         return $this->sendResponse($contact);
     }
 
@@ -51,7 +51,7 @@ class ContactController extends BaseApiController
         $validator = Validator::make($request->all(), [
             'contact_type_id' => 'sometimes|required|exists:contact_types,contact_type_id',
             'contact_value' => 'sometimes|required|string|max:255',
-            'address_id' => 'nullable|exists:addresses,address_id',
+            'place_id' => 'nullable|exists:places,place_id',
             'is_active' => 'boolean'
         ]);
 
@@ -60,7 +60,7 @@ class ContactController extends BaseApiController
         }
 
         $contact->update($validator->validated());
-        $contact->load(['contactType', 'address']);
+        $contact->load(['contactType', 'place']);
         return $this->sendResponse($contact);
     }
 
