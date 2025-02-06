@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Models\Gospel;
 use App\Models\Saint;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -64,5 +65,23 @@ class SaintController extends BaseApiController
     {
         $saint->delete();
         return $this->sendResponse(null, 204);
+    }
+
+    public function searchName(Request $request): JsonResponse
+    {
+        $query = $request->input('query', '');
+
+        if (empty($query)) {
+            $results = Saint::query()
+                ->orderBy('updated_at', 'desc')
+                ->limit(10)
+                ->get(['saint_id', 'name']);
+        }
+
+        $results = Saint::where('name', 'like', '%' . $query . '%')
+            ->limit(10)
+            ->get(['saint_id', 'name']);
+
+        return $this->sendResponse($results);
     }
 }

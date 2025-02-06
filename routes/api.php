@@ -49,6 +49,7 @@ Route::prefix('mdv/v1')->group(function () {
     Route::apiResource('seeds', SeedController::class);
 
     Route::get('search/gospels', [GospelController::class, 'searchVerse']);
+    Route::get('search/saints', [SaintController::class, 'searchName']);
 
     // Contact Management Routes
     Route::group(['prefix' => 'contacts'], function () {

@@ -107,7 +107,7 @@ CREATE TABLE events (
     end_date DATE DEFAULT '9999-01-01',
     start_time TIME,
     end_time TIME,
-    place VARCHAR(255) NOT NULL,
+    place VARCHAR(150),
     is_holy_mass BOOLEAN DEFAULT FALSE,
     is_recurring BOOLEAN DEFAULT FALSE,
     recurrence_pattern VARCHAR(50),
