@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Utils\DateFormatter;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -34,6 +36,18 @@ class Event extends Model
         'created_at' => 'datetime',
         'updated_at' => 'datetime'
     ];
+
+    public function toArray(): array
+    {
+        $array = parent::toArray();
+        $array['start_date'] = DateFormatter::formatDate($this->start_date);
+        $array['end_date'] = DateFormatter::formatDate($this->end_date);
+        $array['start_time'] = DateFormatter::formatDateTime($this->start_time);
+        $array['end_time'] = DateFormatter::formatDateTime($this->end_time);
+        $array['created_at'] = DateFormatter::formatDateTime($this->created_at);
+        $array['updated_at'] = DateFormatter::formatDateTime($this->updated_at);
+        return $array;
+    }
 
     public function place(): BelongsTo
     {

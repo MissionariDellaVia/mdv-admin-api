@@ -10,12 +10,14 @@ return new class extends Migration
     {
         Schema::create('contacts', function (Blueprint $table) {
             $table->id('contact_id');
-            $table->foreignId('contact_type_id')->constrained('contact_types', 'contact_type_id');
-            $table->string('contact_value', 255);
+            $table->enum('contact_type', ['Email', 'Phone', 'Fax', 'Other']);
+            $table->string('contact_group', 50)->nullable();
+            $table->string('contact_type_description', 50)->nullable();
+            $table->string('contact_value', 150);
             $table->foreignId('place_id')->nullable()->constrained('places', 'place_id');
             $table->boolean('is_active')->default(true);
             $table->timestamp('created_at')->useCurrent();
-            $table->timestamp('updated_at')->nullable();
+            $table->dateTime('updated_at')->nullable();
         });
     }
 

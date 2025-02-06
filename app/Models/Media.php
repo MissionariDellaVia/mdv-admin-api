@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Utils\DateFormatter;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 
@@ -26,6 +27,14 @@ class Media extends Model
         'created_at' => 'datetime',
         'updated_at' => 'datetime'
     ];
+
+    public function toArray(): array
+    {
+        $array = parent::toArray();
+        $array['created_at'] = DateFormatter::formatDateTime($this->created_at);
+        $array['updated_at'] = DateFormatter::formatDateTime($this->updated_at);
+        return $array;
+    }
 
     // Get full URL for the media file
     public function getUrlAttribute(): string

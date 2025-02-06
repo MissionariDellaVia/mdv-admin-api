@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use DateTimeInterface;
+use App\Utils\DateFormatter;
 use Illuminate\Database\Eloquent\Model;
 
 class Saint extends Model
@@ -15,8 +15,10 @@ class Saint extends Model
     public function toArray(): array
     {
         $array = parent::toArray();
-        $array['recurrence_date'] = $this->recurrence_date ? $this->recurrence_date->format('Y-m-d') : null;
-        $array['feast_day'] = $this->feast_day ? $this->feast_day->format('Y-m-d') : null;
+        $array['recurrence_date'] = DateFormatter::formatDate($this->recurrence_date);
+        $array['feast_day'] = DateFormatter::formatDate($this->feast_day);
+        $array['created_at'] = DateFormatter::formatDateTime($this->created_at);
+        $array['updated_at'] = DateFormatter::formatDateTime($this->updated_at);
         return $array;
     }
 

@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Utils\DateFormatter;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
@@ -25,6 +27,14 @@ class Gospel extends Model
         'created_at' => 'datetime',
         'updated_at' => 'datetime'
     ];
+
+    public function toArray(): array
+    {
+        $array = parent::toArray();
+        $array['created_at'] = DateFormatter::formatDateTime($this->created_at);
+        $array['updated_at'] = DateFormatter::formatDateTime($this->updated_at);
+        return $array;
+    }
 
     public function comments(): HasMany
     {

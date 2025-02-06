@@ -40,13 +40,12 @@ class EventController extends BaseApiController
             'description' => 'nullable|string',
             'start_date' => 'required|date',
             'end_date' => 'nullable|date|after_or_equal:start_date',
-            'start_time' => 'nullable|date_format:H:i:s',
-            'end_time' => 'nullable|date_format:H:i:s|after:start_time',
-            'place' => 'required|string|max:255',
+            'start_time' => 'nullable|date_format:Y-m-d H:i:s',
+            'end_time' => 'nullable|date_format:Y-m-d H:i:s|after:start_time',
             'is_holy_mass' => 'boolean',
             'is_recurring' => 'boolean',
             'recurrence_pattern' => 'nullable|string|max:50',
-            'place_id' => 'nullable|exists:places,place_id'
+            'place_id' => 'required|exists:places,place_id'
         ]);
 
         if ($validator->fails()) {
@@ -70,9 +69,8 @@ class EventController extends BaseApiController
             'description' => 'nullable|string',
             'start_date' => 'sometimes|required|date',
             'end_date' => 'nullable|date|after_or_equal:start_date',
-            'start_time' => 'nullable|date_format:H:i:s',
-            'end_time' => 'nullable|date_format:H:i:s|after:start_time',
-            'place' => 'sometimes|required|string|max:255',
+            'start_time' => 'nullable|date_format:Y-m-d H:i:s',
+            'end_time' => 'nullable|date_format:Y-m-d H:i:s|after:start_time',
             'is_holy_mass' => 'boolean',
             'is_recurring' => 'boolean',
             'recurrence_pattern' => 'nullable|string|max:50',

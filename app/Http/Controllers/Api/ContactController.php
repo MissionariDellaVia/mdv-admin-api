@@ -2,71 +2,71 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Http\Controllers\Controller;
 use App\Models\Contact;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Validator;
+use function Pest\Laravel\get;
 
-class ContactController extends BaseApiController
+class ContactController extends Controller
 {
-    public function index(Request $request): JsonResponse
+    public function index(): JsonResponse
     {
-        $query = Contact::with(['contactType', 'place']);
-
-        // Optional filtering by contact type
-        if ($request->has('contact_type_id')) {
-            $query->where('contact_type_id', $request->contact_type_id);
-        }
-
-        $contacts = $query->where('is_active', true)->get();
-        return $this->sendResponse($contacts);
+        $contacts = Contact::with('place')->get();
+        return response()->json($contacts);
     }
 
     public function store(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [
-            'contact_type_id' => 'required|exists:contact_types,contact_type_id',
-            'contact_value' => 'required|string|max:255',
-            'place_id' => 'nullable|exists:places,place_id',
+            'contact_type' => 'required|in:Email,Phone,Fax,Other',
+            'contact_group' => 'nullable|string|max:50',
+            'contact_type_description' => 'nullable|string|max:50',
+            'contact_value' => 'required|string|max:150',
+            'place_id' => 'required|exists:places,place_id',
             'is_active' => 'boolean'
         ]);
 
         if ($validator->fails()) {
-            return $this->sendError('Validation failed', $validator->errors(), 422);
+            return response()->json(['error' => 'Validation Error', 'messages' => $validator->errors()], 422);
         }
 
         $contact = Contact::create($validator->validated());
-        $contact->load(['contactType', 'place']);
-        return $this->sendResponse($contact, 201);
+        return response()->json($contact, 201);
     }
 
-    public function show(Contact $contact): JsonResponse
+    public function show($id): JsonResponse
     {
-        $contact->load(['contactType', 'place']);
-        return $this->sendResponse($contact);
+        $contact = Contact::findOrFail($id);
+        return response()->json($contact);
     }
 
-    public function update(Request $request, Contact $contact): JsonResponse
+    public function update(Request $request, $id): JsonResponse
     {
+        $contact = Contact::findOrFail($id);
+
         $validator = Validator::make($request->all(), [
-            'contact_type_id' => 'sometimes|required|exists:contact_types,contact_type_id',
-            'contact_value' => 'sometimes|required|string|max:255',
+            'contact_type' => 'required|in:Email,Phone,Fax,Other',
+            'contact_group' => 'nullable|string|max:50',
+            'contact_type_description' => 'nullable|string|max:50',
+            'contact_value' => 'required|string|max:150',
             'place_id' => 'nullable|exists:places,place_id',
             'is_active' => 'boolean'
         ]);
 
         if ($validator->fails()) {
-            return $this->sendError('Validation failed', $validator->errors(), 422);
+            return response()->json(['error' => 'Validation Error', 'messages' => $validator->errors()], 422);
         }
 
         $contact->update($validator->validated());
-        $contact->load(['contactType', 'place']);
-        return $this->sendResponse($contact);
+        return response()->json($contact);
     }
 
-    public function destroy(Contact $contact): JsonResponse
+    public function destroy($id): JsonResponse
     {
+        $contact = Contact::findOrFail($id);
         $contact->delete();
-        return $this->sendResponse(null, 204);
+        return response()->json(null, 204);
     }
 }

@@ -70,16 +70,6 @@ CREATE TABLE gospel_way (
     UNIQUE INDEX idx_calendar_date (calendar_date)
 ) ENGINE=InnoDB;
 
--- Contact Types (Email, Phone, Friar, Nun, etc.)
-CREATE TABLE contact_types (
-    contact_type_id INT AUTO_INCREMENT PRIMARY KEY,
-    type_name VARCHAR(50) NOT NULL UNIQUE,
-    description TEXT,
-    is_active BOOLEAN DEFAULT TRUE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME
-) ENGINE=InnoDB;
-
 -- Places
 CREATE TABLE places (
     place_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -97,13 +87,14 @@ CREATE TABLE places (
 -- Contacts with their types and places
 CREATE TABLE contacts (
     contact_id INT AUTO_INCREMENT PRIMARY KEY,
-    contact_type_id INT NOT NULL,
-    contact_value VARCHAR(255) NOT NULL,
+    contact_type ENUM('Email', 'Phone', 'Fax', 'Other') NOT NULL,
+    contact_group VARCHAR(50),
+    contact_type_description VARCHAR(50),
+    contact_value VARCHAR(150) NOT NULL,
     place_id INT,
     is_active BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME,
-    FOREIGN KEY (contact_type_id) REFERENCES contact_types(contact_type_id),
     FOREIGN KEY (place_id) REFERENCES places(place_id)
 ) ENGINE=InnoDB;
 

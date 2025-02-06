@@ -52,7 +52,6 @@ Route::prefix('mdv/v1')->group(function () {
 
     // Contact Management Routes
     Route::group(['prefix' => 'contacts'], function () {
-        Route::apiResource('types', ContactTypeController::class);
         Route::apiResource('places', PlaceController::class);
     });
 
