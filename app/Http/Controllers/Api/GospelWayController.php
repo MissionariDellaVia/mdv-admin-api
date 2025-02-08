@@ -20,18 +20,20 @@ class GospelWayController extends BaseApiController
         $limit = $request->input('limit', 10);
 
         $query = GospelWay::with(['gospel', 'saint']);
-
         // Filter by date range
         if ($request->has('date')) {
             $query->whereDate('calendar_date', $request->date);
         }
 
-        // Filter by liturgical season
-        if ($request->has('liturgical_season')) {
-            $query->where('liturgical_season', $request->liturgical_season);
-        }
-
         $gospelWays = $query->orderBy('calendar_date')->paginate($limit, ['*'], 'page', $page);
+
+        // Add the latest comment to each gospel
+        $gospelWays->getCollection()->transform(function ($gospelWay) {
+            $latestComment = $gospelWay->gospel->comments()->orderBy('created_at', 'desc')->first();
+            $gospelWay->gospel->latest_comment = $latestComment;
+            return $gospelWay;
+        });
+
         return $this->sendResponse($gospelWays);
     }
 
@@ -40,6 +42,9 @@ class GospelWayController extends BaseApiController
         $validator = Validator::make($request->all(), [
             'calendar_date' => 'required|date|unique:gospel_way',
             'gospel_id' => 'required|exists:gospels,gospel_id',
+            'comment' => 'required|string',
+            'extra_info' => 'required|string',
+            'youtube_link' => 'nullable|url|max:255',
             'saint_id' => 'nullable|exists:saints,saint_id',
             'liturgical_season' => 'nullable|string|max:100',
             'is_solemnity' => 'boolean',
@@ -52,6 +57,13 @@ class GospelWayController extends BaseApiController
         }
 
         $data = $validator->validated();
+
+        Comment::create([
+            'gospel_id' => $data['gospel_id'],
+            'comment_text' => $data['comment'],
+            'extra_info' => $data['extra_info'],
+            'youtube_link' => $data['youtube_link']
+        ]);
 
         if (empty($data['saint_id'])) {
             $calendarDate = Carbon::parse($data['calendar_date']);
