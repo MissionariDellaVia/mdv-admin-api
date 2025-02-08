@@ -44,6 +44,7 @@ Route::controller(AuthController::class)->group(function(){
 
 // Routes protected by tokens
 Route::middleware('auth:sanctum')->group(function () {
+    Route::post('logout', [AuthController::class, 'logout']);
     Route::prefix('mdv/v1')->group(function () {
         // Sacred Content Routes
         Route::apiResource('saints', SaintController::class);
@@ -55,6 +56,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
         Route::get('search/gospels', [GospelController::class, 'searchVerse']);
         Route::get('search/saints', [SaintController::class, 'searchName']);
+
 
         // Contact Management Routes
         Route::group(['prefix' => 'contacts'], function () {

@@ -63,7 +63,7 @@ class AuthController extends BaseApiController
     /**
      * Logs out the user (invalidates their current token).
      */
-    public function logout(Request $request)
+    public function logout(Request $request): JsonResponse
     {
         $request->user()->currentAccessToken()->delete();
 
