@@ -2,8 +2,9 @@
 
 namespace App\Exceptions;
 
-use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Validation\ValidationException;
 use Throwable;
 
@@ -18,6 +19,14 @@ class Handler extends ExceptionHandler
                     'Record not found',
                     ['id' => ['The requested resource was not found']],
                     404
+                ))->render();
+            }
+
+            if ($e instanceof AuthenticationException) {
+                return (new ApiException(
+                    'Autohentication failed',
+                    ['id' => ['authenticate failed']],
+                    401
                 ))->render();
             }
 
@@ -42,4 +51,5 @@ class Handler extends ExceptionHandler
             return parent::render(request(), $e);
         });
     }
+
 }

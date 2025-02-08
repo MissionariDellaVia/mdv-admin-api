@@ -2,19 +2,17 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Api\{
+use App\Http\Controllers\Api\{AuthController,
     SaintController,
     GospelController,
     CommentController,
     GospelWayController,
-    ContactTypeController,
     PlaceController,
     ContactController,
     EventController,
     TextContentController,
     MediaController,
-    SeedController
-};
+    SeedController};
 
 
 Route::get('/user', function (Request $request) {
@@ -39,39 +37,47 @@ Route::get('ping', function () {
     ]);
 });
 
-Route::prefix('mdv/v1')->group(function () {
-    // Sacred Content Routes
-    Route::apiResource('saints', SaintController::class);
-    Route::apiResource('gospels', GospelController::class);
-    Route::apiResource('comments', CommentController::class);
-    Route::apiResource('gospel-way', GospelWayController::class);
-    Route::get('seeds/random', [SeedController::class, 'random']);
-    Route::apiResource('seeds', SeedController::class);
+Route::controller(AuthController::class)->group(function(){
+    Route::post('register', 'register')->name('register');
+    Route::post('login', 'login')->name('login');
+});
 
-    Route::get('search/gospels', [GospelController::class, 'searchVerse']);
-    Route::get('search/saints', [SaintController::class, 'searchName']);
+// Routes protected by tokens
+Route::middleware('auth:sanctum')->group(function () {
+    Route::prefix('mdv/v1')->group(function () {
+        // Sacred Content Routes
+        Route::apiResource('saints', SaintController::class);
+        Route::apiResource('gospels', GospelController::class);
+        Route::apiResource('comments', CommentController::class);
+        Route::apiResource('gospel-way', GospelWayController::class);
+        Route::get('seeds/random', [SeedController::class, 'random']);
+        Route::apiResource('seeds', SeedController::class);
 
-    // Contact Management Routes
-    Route::group(['prefix' => 'contacts'], function () {
-        Route::apiResource('places', PlaceController::class);
+        Route::get('search/gospels', [GospelController::class, 'searchVerse']);
+        Route::get('search/saints', [SaintController::class, 'searchName']);
+
+        // Contact Management Routes
+        Route::group(['prefix' => 'contacts'], function () {
+            Route::apiResource('places', PlaceController::class);
+        });
+
+        Route::apiResource('contacts', ContactController::class);
+
+        // Events Management
+        Route::apiResource('events', EventController::class);
+
+        // Content Management Routes
+        Route::group(['prefix' => 'content'], function () {
+            // Text Contents
+            Route::get('pages/slug/{slug}', [TextContentController::class, 'findBySlug']);
+            Route::apiResource('pages', TextContentController::class);
+
+            // Media Library
+            Route::apiResource('media', MediaController::class);
+        });
+
+        Route::get('bff/gospel-way', [GospelWayController::class, 'getCompleteGospelWay'])
+            ->name('api.bff.gospel-way');
+
     });
-
-    Route::apiResource('contacts', ContactController::class);
-
-    // Events Management
-    Route::apiResource('events', EventController::class);
-
-    // Content Management Routes
-    Route::group(['prefix' => 'content'], function () {
-        // Text Contents
-        Route::get('pages/slug/{slug}', [TextContentController::class, 'findBySlug']);
-        Route::apiResource('pages', TextContentController::class);
-
-        // Media Library
-        Route::apiResource('media', MediaController::class);
-    });
-
-    Route::get('bff/gospel-way', [GospelWayController::class, 'getCompleteGospelWay'])
-        ->name('api.bff.gospel-way');
-
 });
