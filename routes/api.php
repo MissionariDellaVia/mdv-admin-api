@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\{AuthController,
+    GospelCommentaryController,
     SaintController,
     GospelController,
     CommentController,
@@ -51,6 +52,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::apiResource('gospels', GospelController::class);
         Route::apiResource('comments', CommentController::class);
         Route::apiResource('gospel-way', GospelWayController::class);
+        Route::apiResource('gospel-commentary', GospelCommentaryController::class);
         Route::get('seeds/random', [SeedController::class, 'random']);
         Route::apiResource('seeds', SeedController::class);
 
@@ -80,6 +82,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
         Route::get('bff/gospel-way', [GospelWayController::class, 'getCompleteGospelWay'])
             ->name('api.bff.gospel-way');
-
+        Route::get('bff/gospel-commentary', [GospelCommentaryController::class, 'getCompleteGospelCommentary'])
+            ->name('api.bff.gospel-commentary');
     });
 });

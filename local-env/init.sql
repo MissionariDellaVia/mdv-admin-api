@@ -31,8 +31,6 @@ CREATE TABLE gospels (
     gospel_text TEXT NOT NULL,
     evangelist VARCHAR(100) NOT NULL,
     sacred_text_reference TEXT,
-    liturgical_period VARCHAR(100),
-    latest_comment_id INT DEFAULT NULL,
     is_active BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME,
@@ -40,34 +38,21 @@ CREATE TABLE gospels (
 ) ENGINE=InnoDB;
 
 -- Comments for Gospels (1:N relationship)
-CREATE TABLE comments (
-    comment_id INT AUTO_INCREMENT PRIMARY KEY,
-    gospel_id INT NOT NULL,
-    comment_text TEXT NOT NULL,
-    extra_info TEXT,
-    youtube_link VARCHAR(255),
-    comment_order INT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME,
-    FOREIGN KEY (gospel_id) REFERENCES gospels(gospel_id) ON DELETE CASCADE,
-    INDEX idx_gospel_comments (gospel_id, is_latest)
-) ENGINE=InnoDB;
-
--- GospelWay
-CREATE TABLE gospel_way (
-    calendar_id INT AUTO_INCREMENT PRIMARY KEY,
+CREATE TABLE gospel_commentary (
+    commentary_id INT AUTO_INCREMENT PRIMARY KEY,
     calendar_date DATE NOT NULL,
     gospel_id INT NOT NULL,
     saint_id INT,
+    comment_text TEXT,            -- Holds the comment content for the Gospel
+    extra_info TEXT,              -- Additional commentary information
+    youtube_link VARCHAR(255),    -- Link (for example, to a YouTube video)
     liturgical_season VARCHAR(100),
-    is_solemnity BOOLEAN DEFAULT FALSE,
-    is_feast BOOLEAN DEFAULT FALSE,
-    is_memorial BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME,
-    FOREIGN KEY (gospel_id) REFERENCES gospels(gospel_id),
-    FOREIGN KEY (saint_id) REFERENCES saints(saint_id),
-    UNIQUE INDEX idx_calendar_date (calendar_date)
+    CONSTRAINT fk_gospel
+        FOREIGN KEY (gospel_id) REFERENCES gospels (gospel_id) ON DELETE CASCADE,
+    CONSTRAINT fk_saint
+        FOREIGN KEY (saint_id) REFERENCES saints (saint_id)
 ) ENGINE=InnoDB;
 
 -- Places

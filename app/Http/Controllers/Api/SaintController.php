@@ -76,6 +76,7 @@ class SaintController extends BaseApiController
                 ->orderBy('updated_at', 'desc')
                 ->limit(10)
                 ->get(['saint_id', 'name']);
+            return $this->sendResponse($results);
         }
 
         $results = Saint::where('name', 'like', '%' . $query . '%')

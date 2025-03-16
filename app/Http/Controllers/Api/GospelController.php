@@ -18,7 +18,7 @@ class GospelController extends BaseApiController
         $page = $request->input('page', 1);
         $limit = $request->input('limit', 10);
 
-        $gospels = Gospel::with(['comments'])->paginate($limit, ['*'], 'page', $page);
+        $gospels = Gospel::with(['gospelCommentaries'])->paginate($limit, ['*'], 'page', $page);
         return $this->sendResponse($gospels);
     }
 

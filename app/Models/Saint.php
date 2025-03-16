@@ -10,8 +10,6 @@ class Saint extends Model
     protected $primaryKey = 'saint_id';
     public $timestamps = true;
 
-    protected array $dates = ['recurrence_date', 'feast_day'];
-
     public function toArray(): array
     {
         $array = parent::toArray();

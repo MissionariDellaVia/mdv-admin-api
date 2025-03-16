@@ -40,6 +40,10 @@ class Gospel extends Model
     {
         return $this->hasMany(Comment::class, 'gospel_id');
     }
+    public function gospelCommentaries(): HasMany
+    {
+        return $this->hasMany(GospelCommentary::class, 'gospel_id');
+    }
 
     public function gospelWays(): HasMany
     {
