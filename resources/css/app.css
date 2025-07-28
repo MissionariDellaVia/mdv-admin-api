@@ -1,3 +1,71 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Enhanced text selection and highlighting for cross-platform compatibility */
+@layer base {
+    /* Improve text selection on mobile devices */
+    #text-content {
+        -webkit-user-select: text;
+        -moz-user-select: text;
+        -ms-user-select: text;
+        user-select: text;
+        
+        /* Prevent accidental zoom on iOS when double-tapping */
+        -webkit-touch-callout: default;
+        -webkit-tap-highlight-color: transparent;
+    }
+    
+    /* Enhanced highlighting styles */
+    mark[class*="highlight-"] {
+        border-radius: 2px;
+        padding: 1px 2px;
+        transition: opacity 0.2s ease-in-out;
+        position: relative;
+    }
+    
+    mark[class*="highlight-"]:hover {
+        opacity: 0.8;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+    
+    /* Responsive design improvements */
+    @media (max-width: 640px) {
+        .color-palette {
+            gap: 0.5rem;
+        }
+        
+        .color-button {
+            width: 2.5rem;
+            height: 2.5rem;
+        }
+        
+        .export-buttons {
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        
+        .export-buttons button {
+            flex: 1;
+            min-width: 100px;
+        }
+    }
+    
+    /* Focus styles for accessibility */
+    button:focus-visible,
+    .color-button:focus-visible {
+        outline: 2px solid #3B82F6;
+        outline-offset: 2px;
+    }
+    
+    /* Selection styles for better UX */
+    ::selection {
+        background-color: rgba(59, 130, 246, 0.3);
+        color: inherit;
+    }
+    
+    ::-moz-selection {
+        background-color: rgba(59, 130, 246, 0.3);
+        color: inherit;
+    }
+}
