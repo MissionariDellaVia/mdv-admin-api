@@ -54,28 +54,33 @@
 
                         <!-- Text Content Area -->
                         <div class="bg-white dark:bg-zinc-900 rounded-lg shadow-lg p-8">
-                            <div id="text-content" class="prose max-w-none dark:prose-invert" data-selectable="true">
-                                <h2>Sample Text for Highlighting</h2>
-                                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
-                                
-                                <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-                                
-                                <h3>Cross-Platform Compatibility</h3>
-                                <p>This text highlighter is designed to work seamlessly across different platforms including iOS, Android, and desktop browsers. The interface is optimized for touch interactions while maintaining keyboard and mouse support.</p>
-                                
-                                <p>Select any portion of this text to see the highlighting feature in action. You can choose different colors for your highlights and export the highlighted text in various formats.</p>
-                                
-                                <h3>Features</h3>
-                                <ul>
-                                    <li>Multiple highlight colors</li>
-                                    <li>Cross-platform text selection</li>
-                                    <li>Export to plain text</li>
-                                    <li>Export to image format</li>
-                                    <li>Mobile-friendly interface</li>
-                                    <li>Lightweight implementation</li>
-                                </ul>
-                                
-                                <p>The implementation focuses on performance and user experience, ensuring that text selection and highlighting operations are smooth and responsive across all supported devices.</p>
+                            <div id="text-content" class="prose max-w-none dark:prose-invert" data-selectable="true" data-content-id="{{ isset($textContent) ? $textContent->content_id : '' }}">
+                                @if(isset($textContent))
+                                    <h2>{{ $textContent->title }}</h2>
+                                    <div class="content-text">{!! $textContent->getHighlightedContent() !!}</div>
+                                @else
+                                    <h2>Sample Text for Highlighting</h2>
+                                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+                                    
+                                    <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+                                    
+                                    <h3>Cross-Platform Compatibility</h3>
+                                    <p>This text highlighter is designed to work seamlessly across different platforms including iOS, Android, and desktop browsers. The interface is optimized for touch interactions while maintaining keyboard and mouse support.</p>
+                                    
+                                    <p>Select any portion of this text to see the highlighting feature in action. You can choose different colors for your highlights and export the highlighted text in various formats.</p>
+                                    
+                                    <h3>Features</h3>
+                                    <ul>
+                                        <li>Multiple highlight colors</li>
+                                        <li>Cross-platform text selection</li>
+                                        <li>Export to plain text</li>
+                                        <li>Export to image format</li>
+                                        <li>Mobile-friendly interface</li>
+                                        <li>Lightweight implementation</li>
+                                    </ul>
+                                    
+                                    <p>The implementation focuses on performance and user experience, ensuring that text selection and highlighting operations are smooth and responsive across all supported devices.</p>
+                                @endif
                             </div>
                         </div>
 

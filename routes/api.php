@@ -75,6 +75,13 @@ Route::middleware('auth:sanctum')->group(function () {
             // Text Contents
             Route::get('pages/slug/{slug}', [TextContentController::class, 'findBySlug']);
             Route::apiResource('pages', TextContentController::class);
+            
+            // Text Content Highlighting Routes
+            Route::post('pages/{textContent}/highlights', [TextContentController::class, 'addHighlight']);
+            Route::delete('pages/{textContent}/highlights', [TextContentController::class, 'removeHighlight']);
+            Route::delete('pages/{textContent}/highlights/clear', [TextContentController::class, 'clearHighlights']);
+            Route::get('pages/{textContent}/highlighted', [TextContentController::class, 'getHighlightedContent']);
+            Route::get('pages/{textContent}/export', [TextContentController::class, 'exportHighlightedText']);
 
             // Media Library
             Route::apiResource('media', MediaController::class);

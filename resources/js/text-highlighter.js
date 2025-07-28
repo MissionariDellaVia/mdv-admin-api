@@ -1,6 +1,6 @@
 /**
  * TextHighlighter - Cross-platform text highlighting utility
- * Supports iOS, Android, and desktop browsers
+ * Supports iOS, Android, and desktop browsers with API integration
  */
 class TextHighlighter {
     constructor() {
@@ -11,13 +11,84 @@ class TextHighlighter {
         this.touchTimeout = null;
         this.selectionTimeout = null;
         this.initialTouch = null;
+        this.contentId = null;
+        this.apiBaseUrl = '/api/mdv/v1/content/pages';
         
         this.init();
     }
 
     init() {
+        this.loadContentId();
         this.bindEvents();
         this.setActiveColor(this.selectedColor);
+        this.loadExistingHighlights();
+    }
+
+    loadContentId() {
+        const textContent = document.getElementById('text-content');
+        this.contentId = textContent?.dataset.contentId || null;
+    }
+
+    async loadExistingHighlights() {
+        if (!this.contentId) return;
+        
+        try {
+            const response = await fetch(`${this.apiBaseUrl}/${this.contentId}/highlighted`, {
+                headers: {
+                    'Authorization': `Bearer ${this.getAuthToken()}`,
+                    'Content-Type': 'application/json',
+                }
+            });
+            
+            if (response.ok) {
+                const data = await response.json();
+                // The highlighted content is already rendered from the server
+                console.log(`Loaded content with ${data.data.highlights_count} highlights`);
+            }
+        } catch (error) {
+            console.warn('Could not load existing highlights:', error);
+        }
+    }
+
+    getAuthToken() {
+        // Try to get token from meta tag, localStorage, or return empty
+        const metaToken = document.querySelector('meta[name="api-token"]');
+        if (metaToken) return metaToken.getAttribute('content');
+        
+        return localStorage.getItem('auth_token') || '';
+    }
+
+    async makeApiRequest(endpoint, method = 'GET', data = null) {
+        const options = {
+            method,
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+            }
+        };
+
+        const authToken = this.getAuthToken();
+        if (authToken) {
+            options.headers['Authorization'] = `Bearer ${authToken}`;
+        }
+
+        if (data) {
+            options.body = JSON.stringify(data);
+        }
+
+        try {
+            const response = await fetch(endpoint, options);
+            const result = await response.json();
+            
+            if (!response.ok) {
+                throw new Error(result.message || 'API request failed');
+            }
+            
+            return result;
+        } catch (error) {
+            console.error('API request failed:', error);
+            throw error;
+        }
     }
 
     bindEvents() {
@@ -29,13 +100,13 @@ class TextHighlighter {
         });
 
         // Clear highlights
-        document.getElementById('clear-highlights').addEventListener('click', () => {
-            this.clearAllHighlights();
+        document.getElementById('clear-highlights').addEventListener('click', async () => {
+            await this.clearAllHighlights();
         });
 
         // Export functions
-        document.getElementById('export-text').addEventListener('click', () => {
-            this.exportAsText();
+        document.getElementById('export-text').addEventListener('click', async () => {
+            await this.exportAsText();
         });
 
         document.getElementById('export-image').addEventListener('click', () => {
@@ -142,7 +213,7 @@ class TextHighlighter {
         });
     }
 
-    handleTextSelection(event) {
+    async handleTextSelection(event) {
         const selection = window.getSelection();
         
         if (!selection || selection.isCollapsed || selection.rangeCount === 0) {
@@ -162,13 +233,72 @@ class TextHighlighter {
             return;
         }
 
-        this.highlightSelection(range, selectedText);
+        // Calculate text offsets for API
+        const contentElement = textContent.querySelector('.content-text') || textContent;
+        const textContent_string = contentElement.textContent;
+        const startOffset = this.getTextOffset(contentElement, range.startContainer, range.startOffset);
+        const endOffset = startOffset + selectedText.length;
+
+        await this.highlightSelection(range, selectedText, startOffset, endOffset);
         
         // Clear the selection
         selection.removeAllRanges();
     }
 
-    highlightSelection(range, text) {
+    getTextOffset(container, node, offset) {
+        let textOffset = 0;
+        const walker = document.createTreeWalker(
+            container,
+            NodeFilter.SHOW_TEXT,
+            null,
+            false
+        );
+
+        let currentNode;
+        while (currentNode = walker.nextNode()) {
+            if (currentNode === node) {
+                return textOffset + offset;
+            }
+            textOffset += currentNode.textContent.length;
+        }
+        
+        return textOffset;
+    }
+
+    async highlightSelection(range, text, startOffset, endOffset) {
+        try {
+            // If we have a content ID, save to API
+            if (this.contentId) {
+                await this.saveHighlightToApi(startOffset, endOffset, this.selectedColor);
+                // Reload the page to show updated highlights from server
+                window.location.reload();
+                return;
+            }
+
+            // Fallback to local highlighting for demo content
+            this.highlightSelectionLocally(range, text);
+            
+        } catch (error) {
+            console.warn('Could not save highlight to API, using local highlighting:', error);
+            this.highlightSelectionLocally(range, text);
+        }
+    }
+
+    async saveHighlightToApi(startOffset, endOffset, color) {
+        if (!this.contentId) {
+            throw new Error('No content ID available');
+        }
+
+        const data = {
+            start: startOffset,
+            end: endOffset,
+            color: color
+        };
+
+        return await this.makeApiRequest(`${this.apiBaseUrl}/${this.contentId}/highlights`, 'POST', data);
+    }
+
+    highlightSelectionLocally(range, text) {
         try {
             // Create highlight element
             const highlightElement = document.createElement('mark');
@@ -263,25 +393,49 @@ class TextHighlighter {
         this.highlights.delete(highlightId);
     }
 
-    clearAllHighlights() {
-        // Create a copy of the keys since we'll be modifying the map
-        const highlightIds = Array.from(this.highlights.keys());
-        highlightIds.forEach(id => this.removeHighlight(id));
+    async clearAllHighlights() {
+        try {
+            if (this.contentId) {
+                await this.makeApiRequest(`${this.apiBaseUrl}/${this.contentId}/highlights/clear`, 'DELETE');
+                // Reload to show updated content
+                window.location.reload();
+                return;
+            }
+
+            // Fallback to local clearing for demo content
+            const highlightIds = Array.from(this.highlights.keys());
+            highlightIds.forEach(id => this.removeHighlight(id));
+        } catch (error) {
+            console.error('Failed to clear highlights:', error);
+            alert('Failed to clear highlights. Please try again.');
+        }
     }
 
-    exportAsText() {
-        const textContent = document.getElementById('text-content');
-        let content = textContent.innerText;
-        
-        // Add information about highlights
-        if (this.highlights.size > 0) {
-            content += '\n\n--- HIGHLIGHTED SECTIONS ---\n';
-            this.highlights.forEach((highlight, id) => {
-                content += `\n[${highlight.color.toUpperCase()}] ${highlight.text}`;
-            });
+    async exportAsText() {
+        try {
+            if (this.contentId) {
+                const response = await this.makeApiRequest(`${this.apiBaseUrl}/${this.contentId}/export`);
+                this.downloadFile(response.data.content, response.data.filename || 'highlighted-text.txt', 'text/plain');
+                return;
+            }
+
+            // Fallback to local export for demo content
+            const textContent = document.getElementById('text-content');
+            let content = textContent.innerText;
+            
+            // Add information about highlights
+            if (this.highlights.size > 0) {
+                content += '\n\n--- HIGHLIGHTED SECTIONS ---\n';
+                this.highlights.forEach((highlight, id) => {
+                    content += `\n[${highlight.color.toUpperCase()}] ${highlight.text}`;
+                });
+            }
+            
+            this.downloadFile(content, 'highlighted-text.txt', 'text/plain');
+        } catch (error) {
+            console.error('Failed to export text:', error);
+            alert('Failed to export text. Please try again.');
         }
-        
-        this.downloadFile(content, 'highlighted-text.txt', 'text/plain');
     }
 
     async exportAsImage() {
